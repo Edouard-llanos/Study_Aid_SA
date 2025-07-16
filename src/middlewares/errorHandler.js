@@ -1,7 +1,10 @@
-// middlewares/errorHandler.js
-const errorHandler = (err, req, res, next) => {
-    console.error(err.stack); // Log del error
-    res.status(500).json({ message: 'Algo salió mal', error: err.message });
-};
+// src/middlewares/errorHandler.js
+// — exporta directamente la función, NO un objeto ni llaves
+function errorHandler(err, req, res, next) {
+    const status = err.status || 500;
+    res.status(status).json({
+        message: err.message || 'Internal Server Error'
+    });
+}
 
-module.exports = { errorHandler };
+module.exports = errorHandler;

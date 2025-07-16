@@ -1,15 +1,23 @@
-// routes/userRoutes.js
 const express = require('express');
-const router = express.Router();
-const userController = require('../controllers/userController');
-const { authMiddleware } = require('../middlewares/authMiddleware'); // Si necesitas autenticación
+const router  = express.Router();
 
-// Rutas públicas
-router.post('/register', userController.register);
-router.post('/login', userController.login);
+// Asegúrate de importar un controlador que **sí** exporte funciones:
+// Por ejemplo, en ../controllers/userController.js:
+// module.exports = { getAllUsers, getUserById, … }
+const {
+    getAllUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser
+} = require('../controllers/userController');
 
-// Rutas protegidas (requieren autenticación)
-router.get('/profile', authMiddleware, userController.getProfile);
-router.put('/profile', authMiddleware, userController.updateProfile);
+// Define tus endpoints con handlers válidos:
+router.get('/',       getAllUsers);
+router.get('/:id',    getUserById);
+router.post('/',      createUser);
+router.put('/:id',    updateUser);
+router.delete('/:id', deleteUser);
 
+// **EXPORTA** directamente el router, no dentro de un objeto:
 module.exports = router;

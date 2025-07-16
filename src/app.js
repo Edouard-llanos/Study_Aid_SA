@@ -1,31 +1,35 @@
-// app.js
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const config = require('./config'); // Importa la configuración del sistema
-const userRoutes = require('./routes/userRoutes');
-const topicRoutes = require('./routes/topicRoutes');
-const { errorHandler } = require('./middlewares/errorHandler');
+// src/app.js
+const express      = require('express');
+const cors         = require('cors');
+const mongoose     = require('mongoose');
+const config       = require('./config');               // src/config/index.js
+const userRoutes   = require('./routes/userRoutes');    // ahora debe ser un Router
+const topicRoutes  = require('./routes/topicRoutes');   // idem
+const errorHandler = require('./middlewares/errorHandler'); // función middleware
 
 const app = express();
 
-// Middlewares
-app.use(cors()); // Habilita CORS
-app.use(express.json()); // Para parsear el cuerpo de las peticiones como JSON
+app.use(cors());
+app.use(express.json());
 
-// Conexión a la base de datos (si usas Mongoose)
+// conexión a MongoDB
 mongoose.connect(config.databaseURL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-    .then(() => console.log('Conectado a la base de datos'))
-    .catch(err => console.error('Error al conectar a la base de datos:', err));
+    .then(() => console.log('✅ Conectado a la base de datos'))
+    .catch(err => console.error('❌ Error BD:', err));
 
-// Rutas
-app.use('/api/users', userRoutes);
+// monta correctamente los routers
+app.use('/api/users',  userRoutes);
 app.use('/api/topics', topicRoutes);
 
-// Middleware de manejo de errores (siempre al final)
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({ message: `No se encontró ${req.originalUrl}` });
+});
+
+// error handler
 app.use(errorHandler);
 
 module.exports = app;
